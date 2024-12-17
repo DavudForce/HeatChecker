@@ -28,12 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            tempProgressBar = new CustomProgressBar();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             label1 = new Label();
             label2 = new Label();
@@ -53,29 +54,21 @@
             label12 = new Label();
             groupBox1 = new GroupBox();
             groupBox2 = new GroupBox();
-            chckPlaySfx = new CheckBox();
             label14 = new Label();
             label13 = new Label();
             label4 = new Label();
             label15 = new Label();
             lblBatteryStatus = new Label();
+            tempProgressBar = new CustomProgressBar();
+            notifyIcon = new NotifyIcon(components);
+            contextMenuStrip = new ContextMenuStrip(components);
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)chart1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             SuspendLayout();
-            // 
-            // tempProgressBar
-            // 
-            tempProgressBar.BackColor = Color.DimGray;
-            tempProgressBar.ForeColor = Color.Gainsboro;
-            tempProgressBar.Location = new Point(0, 136);
-            tempProgressBar.Name = "tempProgressBar";
-            tempProgressBar.Size = new Size(800, 23);
-            tempProgressBar.Style = ProgressBarStyle.Continuous;
-            tempProgressBar.TabIndex = 0;
-            tempProgressBar.Value = 100;
             // 
             // chart1
             // 
@@ -108,7 +101,7 @@
             chart1.Series.Add(series1);
             chart1.Series.Add(series2);
             chart1.Series.Add(series3);
-            chart1.Size = new Size(800, 129);
+            chart1.Size = new Size(800, 155);
             chart1.TabIndex = 1;
             chart1.Text = "THE CHART!";
             // 
@@ -177,7 +170,7 @@
             // 
             // trackBar1
             // 
-            trackBar1.Location = new Point(562, 33);
+            trackBar1.Location = new Point(114, 37);
             trackBar1.Maximum = 20;
             trackBar1.Name = "trackBar1";
             trackBar1.Size = new Size(203, 45);
@@ -293,33 +286,24 @@
             // 
             // groupBox2
             // 
-            groupBox2.Controls.Add(chckPlaySfx);
             groupBox2.Controls.Add(trackBar1);
             groupBox2.Controls.Add(label14);
             groupBox2.Controls.Add(label13);
             groupBox2.Controls.Add(label4);
-            groupBox2.Location = new Point(10, 195);
+            groupBox2.Enabled = false;
+            groupBox2.Location = new Point(452, 195);
             groupBox2.Name = "groupBox2";
-            groupBox2.Size = new Size(776, 84);
+            groupBox2.Size = new Size(334, 84);
             groupBox2.TabIndex = 5;
             groupBox2.TabStop = false;
             groupBox2.Text = "Basic Settings";
-            // 
-            // chckPlaySfx
-            // 
-            chckPlaySfx.AutoSize = true;
-            chckPlaySfx.Location = new Point(13, 22);
-            chckPlaySfx.Name = "chckPlaySfx";
-            chckPlaySfx.Size = new Size(70, 19);
-            chckPlaySfx.TabIndex = 4;
-            chckPlaySfx.Text = "Play SFX";
-            chckPlaySfx.UseVisualStyleBackColor = true;
+            groupBox2.Visible = false;
             // 
             // label14
             // 
             label14.AutoSize = true;
             label14.ForeColor = Color.Gray;
-            label14.Location = new Point(724, 15);
+            label14.Location = new Point(276, 19);
             label14.Name = "label14";
             label14.Size = new Size(46, 15);
             label14.TabIndex = 2;
@@ -329,7 +313,7 @@
             // 
             label13.AutoSize = true;
             label13.ForeColor = Color.Gray;
-            label13.Location = new Point(562, 15);
+            label13.Location = new Point(114, 19);
             label13.Name = "label13";
             label13.Size = new Size(41, 15);
             label13.TabIndex = 2;
@@ -338,7 +322,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(454, 33);
+            label4.Location = new Point(6, 37);
             label4.Name = "label4";
             label4.Size = new Size(90, 15);
             label4.TabIndex = 2;
@@ -365,11 +349,50 @@
             lblBatteryStatus.Text = "Charging";
             lblBatteryStatus.TextAlign = ContentAlignment.MiddleLeft;
             // 
+            // tempProgressBar
+            // 
+            tempProgressBar.BackColor = Color.DimGray;
+            tempProgressBar.ForeColor = Color.Gainsboro;
+            tempProgressBar.Location = new Point(370, 162);
+            tempProgressBar.Name = "tempProgressBar";
+            tempProgressBar.Size = new Size(10, 23);
+            tempProgressBar.Style = ProgressBarStyle.Continuous;
+            tempProgressBar.TabIndex = 0;
+            tempProgressBar.Value = 100;
+            tempProgressBar.Visible = false;
+            // 
+            // notifyIcon
+            // 
+            notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
+            notifyIcon.BalloonTipText = "BaloonTip Text";
+            notifyIcon.BalloonTipTitle = "BaloonTip Title";
+            notifyIcon.Icon = (Icon)resources.GetObject("notifyIcon.Icon");
+            notifyIcon.Text = "HeatChecker";
+            notifyIcon.Visible = true;
+            // 
+            // contextMenuStrip
+            // 
+            contextMenuStrip.Name = "contextMenuStrip";
+            contextMenuStrip.RenderMode = ToolStripRenderMode.Professional;
+            contextMenuStrip.Size = new Size(61, 4);
+            contextMenuStrip.Text = "Restore";
+            // 
+            // button1
+            // 
+            button1.Location = new Point(12, 214);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 6;
+            button1.Text = "Settings";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(button1);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Controls.Add(label2);
@@ -400,8 +423,6 @@
         }
 
         #endregion
-
-        private CustomProgressBar tempProgressBar;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private Label label1;
         private Label label2;
@@ -421,11 +442,14 @@
         private Label label12;
         private GroupBox groupBox1;
         private GroupBox groupBox2;
-        private CheckBox chckPlaySfx;
         private Label label14;
         private Label label13;
         private Label label4;
         private Label label15;
         private Label lblBatteryStatus;
+        private CustomProgressBar tempProgressBar;
+        private NotifyIcon notifyIcon;
+        private ContextMenuStrip contextMenuStrip;
+        private Button button1;
     }
 }

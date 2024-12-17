@@ -1,6 +1,8 @@
 using LibreHardwareMonitor.Hardware;
 using LibreHardwareMonitor.Hardware.Cpu;
+using System.IO.Pipes;
 using System.Threading;
+using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using LOHM = LibreHardwareMonitor.Hardware;
 
@@ -8,6 +10,8 @@ namespace HeatChecker
 {
     public partial class Form1 : Form
     {
+        SettingsModel settingsM = new SettingsModel();
+
         private LOHM.Computer _computer;
         private System.Windows.Forms.Timer _timer;
         //private Chart chart1;
@@ -44,19 +48,74 @@ namespace HeatChecker
             InitializeTimer();
             InitializeHardwareMonitor();
             InitializeCustomProgressBar();
+            InitializeSystemTray();
         }
+
+        private void InitializeSystemTray()
+        {
+            if (settingsM.MinimizeToSystemtray)
+            {
+                // Set up the NotifyIcon
+                string appPth = Application.StartupPath;
+                notifyIcon.Icon = new System.Drawing.Icon($"{appPth}/Resources/sysnoc.sys");
+                notifyIcon.Text = $"HeatChecker ({Application.ProductVersion})";
+                notifyIcon.Visible = true;
+
+                // Handle NotifyIcon events
+                notifyIcon.DoubleClick += NotifyIcon_DoubleClick;
+
+                // Add a ContextMenuStrip
+                ContextMenuStrip contextMenu = new ContextMenuStrip();
+                contextMenu.Items.Add("Restore", null, Restore_Click);
+                contextMenu.Items.Add("Exit", null, Exit_Click);
+                notifyIcon.ContextMenuStrip = contextMenu;
+            }
+        }
+
+        #region System Tray stuff
+
+        private void NotifyIcon_DoubleClick(object sender, EventArgs e)
+        {
+            ShowForm();
+        }
+
+        private void Restore_Click(object sender, EventArgs e)
+        {
+            ShowForm();
+        }
+
+        private void Exit_Click(object sender, EventArgs e)
+        {
+            notifyIcon.Visible = false;
+            Application.Exit();
+        }
+
+        private void ShowForm()
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.BringToFront();
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.Hide();
+            }
+        }
+
+        #endregion
 
         private void Form1_Load(object sender, EventArgs e)
         {
             PlaySfx(SfxVine);
-
-            var _cancellationTokenSource = new CancellationTokenSource();
-            Task.Run(() => MonitorBatteryStatus(_cancellationTokenSource.Token));
         }
 
         private void PlaySfx(string SfxPath)
         {
-            if (PlaySounds)
+            if (PlaySounds && settingsM.PlaySounds)
                 new System.Media.SoundPlayer(SfxPath).Play();
         }
 
@@ -82,23 +141,6 @@ namespace HeatChecker
 
         private void InitializeChart()
         {
-            /* Create and configure the Chart
-            chart1 = new Chart
-            {
-                Dock = DockStyle.Top,
-                Height = 300
-            };
-            this.Controls.Add(chart1);
-            
-
-            ChartArea chartArea = new ChartArea();
-            chart1.ChartAreas.Add(chartArea);
-
-            // Add series for Temperature, CPU Load, and Fan Speed
-            chart1.Series.Add("CpuTemp");
-            chart1.Series.Add("CpuLoad");
-            chart1.Series.Add("FanSpeed");
-            */
             chart1.ChartAreas[0].AxisX.IsStartedFromZero = true;
             chart1.ChartAreas[0].AxisX.IsMarginVisible = false;   // Remove extra margins for smooth scrolling
 
@@ -115,7 +157,7 @@ namespace HeatChecker
             // Timer to update the data every second
             _timer = new System.Windows.Forms.Timer
             {
-                Interval = 1000 // 1 second
+                Interval = settingsM.UpdateInterval >= 0 ? 1000 : settingsM.UpdateInterval // 1 second
             };
             _timer.Tick += Timer_Tick;
             _timer.Start();
@@ -123,6 +165,22 @@ namespace HeatChecker
 
         private void Timer_Tick(object sender, EventArgs e)
         {
+            if(settingsM.WarmWhen != StngChrageStatus.Disabled)
+            {
+                PowerStatus pwr = System.Windows.Forms.SystemInformation.PowerStatus;
+
+                bool isCharging = pwr.PowerLineStatus == PowerLineStatus.Online ? true : false;
+
+                var chargeStatus = pwr.BatteryChargeStatus;
+
+                string chrgl = chargeStatus.ToString().ToLower();
+
+                if (!isCharging || (chrgl.Contains("low") && !isCharging))
+                {
+                    HandleLowBattery();
+                }
+            }
+
             float cpuTempUI = 0;
             foreach (var hardwareItem in _computer.Hardware)
             {
@@ -174,7 +232,7 @@ namespace HeatChecker
                         if (sensor.SensorType == SensorType.Load && sensor.Name == "CPU Total")
                         {
                             chart1.Series["CpuLoad"].Points.AddXY(M_GLOBAL_INT, sensor.Value.GetValueOrDefault() > 100 ? 100 : sensor.Value);
-                            if (chart1.Series["CpuLoad"].Points.Count > 100)
+                            if (chart1.Series["CpuLoad"].Points.Count >= 100)
                             {
                                 chart1.Series["CpuLoad"].Points.Clear();
                                 M_GLOBAL_INT = 0;
@@ -183,49 +241,34 @@ namespace HeatChecker
                             ScrollChartLeft("CpuLoad");
                         }
                     }
-                    /*
-                    // Monitor fan speed
-                    foreach (var sensor in hardwareItem.Sensors)
-                    {
-                        if (sensor.SensorType == SensorType.Fan)
-                        {
-                            chart1.Series["FanSpeed"].Points.AddXY(M_GLOBAL_INT, sensor.Value.GetValueOrDefault());
-                            if (chart1.Series["FanSpeed"].Points.Count > 100)
-                                chart1.Series["FanSpeed"].Points.RemoveAt(0);
-                        }
-                    }
-                    */
                     hardwareItem.Update();
                     M_GLOBAL_INT++;
-                }
-            }
-
-
-
-        }
-
-        private async Task MonitorBatteryStatus(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                PowerStatus pwr = System.Windows.Forms.SystemInformation.PowerStatus;
-
-                bool isCharging = pwr.PowerLineStatus == PowerLineStatus.Online ? true : false;
-
-                var chargeStatus = pwr.BatteryChargeStatus;
-
-                string chrgl = chargeStatus.ToString().ToLower();
-
-                if (!isCharging || (chrgl.Contains("low") && !isCharging))
-                {
-                    HandleLowBattery();
                 }
             }
         }
 
         private void HandleLowBattery()
         {
+            if(settingsM.PlaySounds)
                 lowBatterySound.PlaySync();
+
+            AnimateLabel(lblBatteryStatus);
+        }
+
+        async Task AnimateLabel(Label label)
+        {
+            label.BackColor = Color.Red;
+            label.ForeColor = Color.WhiteSmoke;
+            Task.Delay(1000).Wait();
+            label.BackColor = Color.WhiteSmoke;
+            label.ForeColor = Color.Red;
+            Task.Delay(1000).Wait();
+            label.BackColor = Color.Red;
+            label.ForeColor = Color.WhiteSmoke;
+            Task.Delay(1000).Wait();
+            label.BackColor = Color.WhiteSmoke;
+            label.ForeColor = Color.Red;
+            Task.Delay(1000).Wait();
         }
 
         private void ScrollChartLeft(string seriesName)
@@ -260,7 +303,7 @@ namespace HeatChecker
                     break;
                 case HeatCategory.Freezing:
                     txtCpuTemp.ForeColor = Color.DeepSkyBlue;
-                    sound1.Play();
+                    if (settingsM.PlaySounds) sound1.Play();
                     break;
                 case HeatCategory.Normal:
                     StopSounds();
@@ -272,17 +315,22 @@ namespace HeatChecker
                     break;
                 case HeatCategory.Hot:
                     txtCpuTemp.ForeColor = Color.Red;
-                    sound2.Play();
+                    if (settingsM.PlaySounds) sound2.Play();
                     break;
                 case HeatCategory.Critical:
                     txtCpuTemp.ForeColor = Color.DarkRed;
-                    sound3.Play();
+                    if (settingsM.PlaySounds) sound3.Play();
                     break;
                 default:
                     txtCpuTemp.Enabled = false;
                     StopSounds();
                     break;
             }
+        }
+
+        private void ApplySettings()
+        {
+            _timer.Interval = settingsM.UpdateInterval * 500 + 1;
         }
 
         private void StopSounds()
@@ -309,7 +357,7 @@ namespace HeatChecker
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            PlaySfx(SfxExit);
+            if (settingsM.PlaySounds) PlaySfx(SfxExit);
             _computer.Close();
             base.OnFormClosed(e);
         }
@@ -335,6 +383,14 @@ namespace HeatChecker
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
             _timer.Interval = trackBar1.Value * 500 + 1;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Settings settings = new Settings(settingsM); // the form!
+            settings.ShowDialog();
+            settingsM = settings.ReturnedSettings;
+            ApplySettings();
         }
     }
 }
