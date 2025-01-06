@@ -28,6 +28,7 @@ namespace HeatChecker
             chckSystemtray.Checked = settingsModel.MinimizeToSystemtray;
             chckAutoStart.Checked = settingsModel.AutoStartup;
             trackbrUpdateInterval.Value = settingsModel.UpdateInterval;
+            trckbarBatteryCheckInterval.Value = settingsModel.BatteryCheckInterval;
 
             var foo = settingsModel.WarmWhen;
             switch (foo)
@@ -61,7 +62,8 @@ namespace HeatChecker
                 PlaySounds = chckPlySounds.Checked,
                 MinimizeToSystemtray = chckSystemtray.Checked,
                 AutoStartup = chckAutoStart.Checked,
-                UpdateInterval = trackbrUpdateInterval.Value
+                UpdateInterval = trackbrUpdateInterval.Value,
+                BatteryCheckInterval = trckbarBatteryCheckInterval.Value
             };
         }
 
@@ -74,6 +76,21 @@ namespace HeatChecker
             if (rdbtnBtryNotCHarging.Checked)
                 return StngChrageStatus.NotCharging;
             return StngChrageStatus.Disabled;
+        }
+
+        private void Settings_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chckBtrySleepPc_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Settings_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape) this.Close();
         }
     }
 }

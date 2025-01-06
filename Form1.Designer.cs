@@ -33,7 +33,6 @@
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             label1 = new Label();
@@ -62,23 +61,49 @@
             tempProgressBar = new CustomProgressBar();
             notifyIcon = new NotifyIcon(components);
             contextMenuStrip = new ContextMenuStrip(components);
+            updateSpeedToolStripMenuItem = new ToolStripMenuItem();
+            fastestToolStripMenuItem = new ToolStripMenuItem();
+            secToolStripMenuItem = new ToolStripMenuItem();
+            secToolStripMenuItem1 = new ToolStripMenuItem();
+            secToolStripMenuItem2 = new ToolStripMenuItem();
+            secToolStripMenuItem3 = new ToolStripMenuItem();
+            secToolStripMenuItem4 = new ToolStripMenuItem();
+            secToolStripMenuItem5 = new ToolStripMenuItem();
+            secToolStripMenuItem6 = new ToolStripMenuItem();
+            updateNowToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            alwaysOnTopToolStripMenuItem = new ToolStripMenuItem();
+            showOnTaskbarToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator3 = new ToolStripSeparator();
+            exitToolStripMenuItem = new ToolStripMenuItem();
+            restartToolStripMenuItem = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            toolStripMenuItem1 = new ToolStripMenuItem();
+            applicationToolStripMenuItem = new ToolStripMenuItem();
             button1 = new Button();
+            menuStrip1 = new MenuStrip();
+            editToolStripMenuItem = new ToolStripMenuItem();
+            settingsToolStripMenuItem = new ToolStripMenuItem();
+            batteryCheckTimer = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)chart1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
+            contextMenuStrip.SuspendLayout();
+            menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // chart1
             // 
+            chart1.BackColor = SystemColors.Control;
             chartArea1.AxisX.MaximumAutoSize = 20F;
             chartArea1.Name = "ChartArea1";
             chart1.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             legend1.TitleSeparator = System.Windows.Forms.DataVisualization.Charting.LegendSeparatorStyle.ThickLine;
             chart1.Legends.Add(legend1);
-            chart1.Location = new Point(0, 1);
+            chart1.Location = new Point(0, 30);
             chart1.Name = "chart1";
             series1.BorderWidth = 2;
             series1.ChartArea = "ChartArea1";
@@ -93,14 +118,8 @@
             series2.Legend = "Legend1";
             series2.LegendText = "CPU Temperature";
             series2.Name = "CpuTemp";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series3.Legend = "Legend1";
-            series3.LegendText = "Fan Speed";
-            series3.Name = "FanSpeed";
             chart1.Series.Add(series1);
             chart1.Series.Add(series2);
-            chart1.Series.Add(series3);
             chart1.Size = new Size(800, 155);
             chart1.TabIndex = 1;
             chart1.Text = "THE CHART!";
@@ -109,7 +128,7 @@
             // 
             label1.AutoSize = true;
             label1.Enabled = false;
-            label1.Location = new Point(52, 162);
+            label1.Location = new Point(52, 191);
             label1.Name = "label1";
             label1.Size = new Size(62, 15);
             label1.TabIndex = 2;
@@ -119,7 +138,7 @@
             // 
             label2.AutoSize = true;
             label2.Enabled = false;
-            label2.Location = new Point(12, 177);
+            label2.Location = new Point(12, 206);
             label2.Name = "label2";
             label2.Size = new Size(102, 15);
             label2.TabIndex = 2;
@@ -129,7 +148,7 @@
             // 
             txtCpuLoad.AutoSize = true;
             txtCpuLoad.Enabled = false;
-            txtCpuLoad.Location = new Point(114, 162);
+            txtCpuLoad.Location = new Point(114, 191);
             txtCpuLoad.Name = "txtCpuLoad";
             txtCpuLoad.Size = new Size(28, 15);
             txtCpuLoad.TabIndex = 2;
@@ -140,7 +159,7 @@
             // 
             txtCpuTemp.AutoSize = true;
             txtCpuTemp.Enabled = false;
-            txtCpuTemp.Location = new Point(114, 177);
+            txtCpuTemp.Location = new Point(114, 206);
             txtCpuTemp.Name = "txtCpuTemp";
             txtCpuTemp.Size = new Size(28, 15);
             txtCpuTemp.TabIndex = 2;
@@ -151,7 +170,7 @@
             // 
             label5.AutoSize = true;
             label5.Enabled = false;
-            label5.Location = new Point(138, 177);
+            label5.Location = new Point(138, 206);
             label5.Name = "label5";
             label5.Size = new Size(19, 15);
             label5.TabIndex = 2;
@@ -161,7 +180,7 @@
             // label6
             // 
             label6.Enabled = false;
-            label6.Location = new Point(138, 162);
+            label6.Location = new Point(138, 191);
             label6.Name = "label6";
             label6.Size = new Size(88, 15);
             label6.TabIndex = 2;
@@ -192,7 +211,7 @@
             // 
             label3.AutoSize = true;
             label3.Enabled = false;
-            label3.Location = new Point(232, 162);
+            label3.Location = new Point(232, 191);
             label3.Name = "label3";
             label3.Size = new Size(64, 15);
             label3.TabIndex = 2;
@@ -202,7 +221,7 @@
             // 
             txtFanSpeed.AutoSize = true;
             txtFanSpeed.Enabled = false;
-            txtFanSpeed.Location = new Point(302, 162);
+            txtFanSpeed.Location = new Point(302, 191);
             txtFanSpeed.Name = "txtFanSpeed";
             txtFanSpeed.Size = new Size(28, 15);
             txtFanSpeed.TabIndex = 2;
@@ -213,7 +232,7 @@
             // 
             label7.AutoSize = true;
             label7.Enabled = false;
-            label7.Location = new Point(332, 162);
+            label7.Location = new Point(332, 191);
             label7.Name = "label7";
             label7.Size = new Size(32, 15);
             label7.TabIndex = 2;
@@ -277,7 +296,7 @@
             groupBox1.Controls.Add(label10);
             groupBox1.Controls.Add(label11);
             groupBox1.Controls.Add(trackBar2);
-            groupBox1.Location = new Point(10, 285);
+            groupBox1.Location = new Point(10, 278);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(776, 86);
             groupBox1.TabIndex = 4;
@@ -291,7 +310,7 @@
             groupBox2.Controls.Add(label13);
             groupBox2.Controls.Add(label4);
             groupBox2.Enabled = false;
-            groupBox2.Location = new Point(452, 195);
+            groupBox2.Location = new Point(452, 191);
             groupBox2.Name = "groupBox2";
             groupBox2.Size = new Size(334, 84);
             groupBox2.TabIndex = 5;
@@ -332,7 +351,7 @@
             // 
             label15.AutoSize = true;
             label15.Enabled = false;
-            label15.Location = new Point(213, 177);
+            label15.Location = new Point(213, 206);
             label15.Name = "label15";
             label15.Size = new Size(82, 15);
             label15.TabIndex = 2;
@@ -342,7 +361,7 @@
             // 
             lblBatteryStatus.AutoSize = true;
             lblBatteryStatus.Enabled = false;
-            lblBatteryStatus.Location = new Point(302, 177);
+            lblBatteryStatus.Location = new Point(302, 206);
             lblBatteryStatus.Name = "lblBatteryStatus";
             lblBatteryStatus.Size = new Size(56, 15);
             lblBatteryStatus.TabIndex = 2;
@@ -353,7 +372,7 @@
             // 
             tempProgressBar.BackColor = Color.DimGray;
             tempProgressBar.ForeColor = Color.Gainsboro;
-            tempProgressBar.Location = new Point(370, 162);
+            tempProgressBar.Location = new Point(370, 191);
             tempProgressBar.Name = "tempProgressBar";
             tempProgressBar.Size = new Size(10, 23);
             tempProgressBar.Style = ProgressBarStyle.Continuous;
@@ -372,14 +391,145 @@
             // 
             // contextMenuStrip
             // 
+            contextMenuStrip.Items.AddRange(new ToolStripItem[] { updateSpeedToolStripMenuItem, updateNowToolStripMenuItem, toolStripSeparator1, alwaysOnTopToolStripMenuItem, showOnTaskbarToolStripMenuItem, toolStripSeparator3, exitToolStripMenuItem, restartToolStripMenuItem, toolStripSeparator2, toolStripMenuItem1 });
             contextMenuStrip.Name = "contextMenuStrip";
+            contextMenuStrip.OwnerItem = applicationToolStripMenuItem;
             contextMenuStrip.RenderMode = ToolStripRenderMode.Professional;
-            contextMenuStrip.Size = new Size(61, 4);
+            contextMenuStrip.Size = new Size(203, 176);
             contextMenuStrip.Text = "Restore";
+            // 
+            // updateSpeedToolStripMenuItem
+            // 
+            updateSpeedToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { fastestToolStripMenuItem, secToolStripMenuItem, secToolStripMenuItem1, secToolStripMenuItem2, secToolStripMenuItem3, secToolStripMenuItem4, secToolStripMenuItem5, secToolStripMenuItem6 });
+            updateSpeedToolStripMenuItem.Enabled = false;
+            updateSpeedToolStripMenuItem.Name = "updateSpeedToolStripMenuItem";
+            updateSpeedToolStripMenuItem.Size = new Size(202, 22);
+            updateSpeedToolStripMenuItem.Text = "Update speed";
+            // 
+            // fastestToolStripMenuItem
+            // 
+            fastestToolStripMenuItem.Name = "fastestToolStripMenuItem";
+            fastestToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.Shift | Keys.F1;
+            fastestToolStripMenuItem.Size = new Size(184, 22);
+            fastestToolStripMenuItem.Text = "Fastest";
+            // 
+            // secToolStripMenuItem
+            // 
+            secToolStripMenuItem.Name = "secToolStripMenuItem";
+            secToolStripMenuItem.Size = new Size(184, 22);
+            secToolStripMenuItem.Text = "200 millisecond";
+            // 
+            // secToolStripMenuItem1
+            // 
+            secToolStripMenuItem1.Name = "secToolStripMenuItem1";
+            secToolStripMenuItem1.Size = new Size(184, 22);
+            secToolStripMenuItem1.Text = "500 millisecond";
+            secToolStripMenuItem1.Click += secToolStripMenuItem1_Click;
+            // 
+            // secToolStripMenuItem2
+            // 
+            secToolStripMenuItem2.Name = "secToolStripMenuItem2";
+            secToolStripMenuItem2.ShortcutKeys = Keys.Alt | Keys.Shift | Keys.F2;
+            secToolStripMenuItem2.Size = new Size(184, 22);
+            secToolStripMenuItem2.Text = "1 sec";
+            // 
+            // secToolStripMenuItem3
+            // 
+            secToolStripMenuItem3.Name = "secToolStripMenuItem3";
+            secToolStripMenuItem3.Size = new Size(184, 22);
+            secToolStripMenuItem3.Text = "2 sec";
+            // 
+            // secToolStripMenuItem4
+            // 
+            secToolStripMenuItem4.Name = "secToolStripMenuItem4";
+            secToolStripMenuItem4.Size = new Size(184, 22);
+            secToolStripMenuItem4.Text = "5 sec";
+            // 
+            // secToolStripMenuItem5
+            // 
+            secToolStripMenuItem5.Name = "secToolStripMenuItem5";
+            secToolStripMenuItem5.Size = new Size(184, 22);
+            secToolStripMenuItem5.Text = "7 sec";
+            // 
+            // secToolStripMenuItem6
+            // 
+            secToolStripMenuItem6.Name = "secToolStripMenuItem6";
+            secToolStripMenuItem6.ShortcutKeys = Keys.Alt | Keys.Shift | Keys.F3;
+            secToolStripMenuItem6.Size = new Size(184, 22);
+            secToolStripMenuItem6.Text = "10 sec";
+            // 
+            // updateNowToolStripMenuItem
+            // 
+            updateNowToolStripMenuItem.Name = "updateNowToolStripMenuItem";
+            updateNowToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.U;
+            updateNowToolStripMenuItem.Size = new Size(202, 22);
+            updateNowToolStripMenuItem.Text = "Update now";
+            updateNowToolStripMenuItem.Click += updateNowToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(199, 6);
+            // 
+            // alwaysOnTopToolStripMenuItem
+            // 
+            alwaysOnTopToolStripMenuItem.CheckOnClick = true;
+            alwaysOnTopToolStripMenuItem.Name = "alwaysOnTopToolStripMenuItem";
+            alwaysOnTopToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.T;
+            alwaysOnTopToolStripMenuItem.Size = new Size(202, 22);
+            alwaysOnTopToolStripMenuItem.Text = "Always on top";
+            alwaysOnTopToolStripMenuItem.Click += alwaysOnTopToolStripMenuItem_Click;
+            // 
+            // showOnTaskbarToolStripMenuItem
+            // 
+            showOnTaskbarToolStripMenuItem.CheckOnClick = true;
+            showOnTaskbarToolStripMenuItem.Name = "showOnTaskbarToolStripMenuItem";
+            showOnTaskbarToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.B;
+            showOnTaskbarToolStripMenuItem.Size = new Size(202, 22);
+            showOnTaskbarToolStripMenuItem.Text = "Show on taskbar";
+            showOnTaskbarToolStripMenuItem.Click += showOnTaskbarToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator3
+            // 
+            toolStripSeparator3.Name = "toolStripSeparator3";
+            toolStripSeparator3.Size = new Size(199, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            exitToolStripMenuItem.ShortcutKeys = Keys.Alt | Keys.F4;
+            exitToolStripMenuItem.Size = new Size(202, 22);
+            exitToolStripMenuItem.Text = "Exit";
+            // 
+            // restartToolStripMenuItem
+            // 
+            restartToolStripMenuItem.Name = "restartToolStripMenuItem";
+            restartToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.R;
+            restartToolStripMenuItem.Size = new Size(202, 22);
+            restartToolStripMenuItem.Text = "Restart";
+            restartToolStripMenuItem.Click += restartToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(199, 6);
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(202, 22);
+            toolStripMenuItem1.Text = "About us";
+            // 
+            // applicationToolStripMenuItem
+            // 
+            applicationToolStripMenuItem.DropDown = contextMenuStrip;
+            applicationToolStripMenuItem.Name = "applicationToolStripMenuItem";
+            applicationToolStripMenuItem.Size = new Size(80, 20);
+            applicationToolStripMenuItem.Text = "Application";
             // 
             // button1
             // 
-            button1.Location = new Point(12, 214);
+            button1.Location = new Point(23, 238);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 6;
@@ -387,11 +537,42 @@
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 
+            // menuStrip1
+            // 
+            menuStrip1.Items.AddRange(new ToolStripItem[] { applicationToolStripMenuItem, editToolStripMenuItem });
+            menuStrip1.Location = new Point(0, 0);
+            menuStrip1.Name = "menuStrip1";
+            menuStrip1.Size = new Size(800, 24);
+            menuStrip1.TabIndex = 7;
+            menuStrip1.Text = "menuStrip1";
+            // 
+            // editToolStripMenuItem
+            // 
+            editToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { settingsToolStripMenuItem });
+            editToolStripMenuItem.Name = "editToolStripMenuItem";
+            editToolStripMenuItem.Size = new Size(39, 20);
+            editToolStripMenuItem.Text = "Edit";
+            // 
+            // settingsToolStripMenuItem
+            // 
+            settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            settingsToolStripMenuItem.ShortcutKeys = Keys.Control | Keys.S;
+            settingsToolStripMenuItem.Size = new Size(156, 22);
+            settingsToolStripMenuItem.Text = "Settings";
+            settingsToolStripMenuItem.Click += settingsToolStripMenuItem_Click;
+            // 
+            // batteryCheckTimer
+            // 
+            batteryCheckTimer.Enabled = true;
+            batteryCheckTimer.Interval = 1;
+            batteryCheckTimer.Tick += batteryCheckTimer_Tick;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(800, 368);
+            Controls.Add(menuStrip1);
             Controls.Add(button1);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
@@ -408,9 +589,15 @@
             Controls.Add(label1);
             Controls.Add(chart1);
             Controls.Add(tempProgressBar);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MainMenuStrip = menuStrip1;
+            MaximizeBox = false;
             Name = "Form1";
-            Text = "Form1";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "HC - 404";
             Load += Form1_Load;
+            KeyDown += Form1_KeyDown;
             ((System.ComponentModel.ISupportInitialize)chart1).EndInit();
             ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).EndInit();
@@ -418,6 +605,9 @@
             groupBox1.PerformLayout();
             groupBox2.ResumeLayout(false);
             groupBox2.PerformLayout();
+            contextMenuStrip.ResumeLayout(false);
+            menuStrip1.ResumeLayout(false);
+            menuStrip1.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -451,5 +641,28 @@
         private NotifyIcon notifyIcon;
         private ContextMenuStrip contextMenuStrip;
         private Button button1;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem applicationToolStripMenuItem;
+        private ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.Timer batteryCheckTimer;
+        private ToolStripMenuItem alwaysOnTopToolStripMenuItem;
+        private ToolStripMenuItem exitToolStripMenuItem;
+        private ToolStripMenuItem restartToolStripMenuItem;
+        private ToolStripMenuItem updateSpeedToolStripMenuItem;
+        private ToolStripMenuItem fastestToolStripMenuItem;
+        private ToolStripMenuItem secToolStripMenuItem;
+        private ToolStripMenuItem secToolStripMenuItem1;
+        private ToolStripMenuItem secToolStripMenuItem2;
+        private ToolStripMenuItem secToolStripMenuItem3;
+        private ToolStripMenuItem secToolStripMenuItem4;
+        private ToolStripMenuItem secToolStripMenuItem5;
+        private ToolStripMenuItem secToolStripMenuItem6;
+        private ToolStripMenuItem updateNowToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem settingsToolStripMenuItem;
+        private ToolStripMenuItem showOnTaskbarToolStripMenuItem;
+        private ToolStripSeparator toolStripSeparator3;
     }
 }

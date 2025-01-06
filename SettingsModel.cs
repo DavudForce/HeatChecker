@@ -9,6 +9,7 @@
     public class SettingsModel
     {
         #region battery
+        public int BatteryCheckInterval { get; set; }
         public bool SleepWhnChrgLow { get; set; }
         public StngChrageStatus WarmWhen { get; set; }
         #endregion

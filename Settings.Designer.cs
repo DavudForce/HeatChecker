@@ -45,8 +45,13 @@
             chckAutoStart = new CheckBox();
             pictureBox1 = new PictureBox();
             rdbtnBatteryChargeDisabled = new RadioButton();
+            label3 = new Label();
+            trckbarBatteryCheckInterval = new TrackBar();
+            label5 = new Label();
+            label6 = new Label();
             ((System.ComponentModel.ISupportInitialize)trackbrUpdateInterval).BeginInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trckbarBatteryCheckInterval).BeginInit();
             SuspendLayout();
             // 
             // rdbtnBtryNotCHarging
@@ -73,10 +78,10 @@
             // 
             // trackbrUpdateInterval
             // 
-            trackbrUpdateInterval.Location = new Point(518, 175);
+            trackbrUpdateInterval.Location = new Point(382, 201);
             trackbrUpdateInterval.Maximum = 20;
             trackbrUpdateInterval.Name = "trackbrUpdateInterval";
-            trackbrUpdateInterval.Size = new Size(203, 45);
+            trackbrUpdateInterval.Size = new Size(327, 45);
             trackbrUpdateInterval.TabIndex = 12;
             trackbrUpdateInterval.Value = 2;
             // 
@@ -84,7 +89,7 @@
             // 
             label14.AutoSize = true;
             label14.ForeColor = Color.Gray;
-            label14.Location = new Point(680, 157);
+            label14.Location = new Point(680, 183);
             label14.Name = "label14";
             label14.Size = new Size(46, 15);
             label14.TabIndex = 9;
@@ -94,7 +99,7 @@
             // 
             label13.AutoSize = true;
             label13.ForeColor = Color.Gray;
-            label13.Location = new Point(518, 157);
+            label13.Location = new Point(379, 183);
             label13.Name = "label13";
             label13.Size = new Size(41, 15);
             label13.TabIndex = 10;
@@ -103,11 +108,11 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new Point(382, 177);
+            label4.Location = new Point(379, 157);
             label4.Name = "label4";
-            label4.Size = new Size(130, 15);
+            label4.Size = new Size(141, 15);
             label4.TabIndex = 11;
-            label4.Text = "Default update interval:";
+            label4.Text = "CPU heat update interval:";
             // 
             // chckPlySounds
             // 
@@ -188,6 +193,7 @@
             chckBtrySleepPc.TabIndex = 5;
             chckBtrySleepPc.Text = "Automatically sleep computer when charge is low";
             chckBtrySleepPc.UseVisualStyleBackColor = true;
+            chckBtrySleepPc.CheckedChanged += chckBtrySleepPc_CheckedChanged;
             // 
             // chckSystemtray
             // 
@@ -232,16 +238,58 @@
             rdbtnBatteryChargeDisabled.UseVisualStyleBackColor = true;
             rdbtnBatteryChargeDisabled.CheckedChanged += rdbtnBatteryChargeDisabled_CheckedChanged;
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(379, 76);
+            label3.Name = "label3";
+            label3.Size = new Size(163, 15);
+            label3.TabIndex = 11;
+            label3.Text = "Battery check update interval:";
+            // 
+            // trckbarBatteryCheckInterval
+            // 
+            trckbarBatteryCheckInterval.Location = new Point(382, 109);
+            trckbarBatteryCheckInterval.Maximum = 20;
+            trckbarBatteryCheckInterval.Name = "trckbarBatteryCheckInterval";
+            trckbarBatteryCheckInterval.Size = new Size(344, 45);
+            trckbarBatteryCheckInterval.TabIndex = 12;
+            trckbarBatteryCheckInterval.Value = 2;
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.ForeColor = Color.Gray;
+            label5.Location = new Point(680, 91);
+            label5.Name = "label5";
+            label5.Size = new Size(46, 15);
+            label5.TabIndex = 9;
+            label5.Text = "slowest";
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.ForeColor = Color.Gray;
+            label6.Location = new Point(379, 91);
+            label6.Name = "label6";
+            label6.Size = new Size(41, 15);
+            label6.TabIndex = 10;
+            label6.Text = "fastest";
+            // 
             // Settings
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(734, 254);
             Controls.Add(pictureBox1);
+            Controls.Add(trckbarBatteryCheckInterval);
             Controls.Add(trackbrUpdateInterval);
+            Controls.Add(label5);
             Controls.Add(label14);
+            Controls.Add(label6);
             Controls.Add(label13);
             Controls.Add(label2);
+            Controls.Add(label3);
             Controls.Add(label1);
             Controls.Add(label4);
             Controls.Add(rdbtnBatteryChargeDisabled);
@@ -261,8 +309,11 @@
             StartPosition = FormStartPosition.CenterParent;
             Text = "Settings";
             FormClosing += Settings_FormClosing;
+            Load += Settings_Load;
+            KeyDown += Settings_KeyDown;
             ((System.ComponentModel.ISupportInitialize)trackbrUpdateInterval).EndInit();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trckbarBatteryCheckInterval).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -285,5 +336,9 @@
         private CheckBox chckAutoStart;
         private PictureBox pictureBox1;
         private RadioButton rdbtnBatteryChargeDisabled;
+        private Label label3;
+        private TrackBar trckbarBatteryCheckInterval;
+        private Label label5;
+        private Label label6;
     }
 }

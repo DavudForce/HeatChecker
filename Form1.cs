@@ -1,6 +1,8 @@
 using LibreHardwareMonitor.Hardware;
 using LibreHardwareMonitor.Hardware.Cpu;
+using System.Diagnostics;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -10,6 +12,9 @@ namespace HeatChecker
 {
     public partial class Form1 : Form
     {
+        [DllImport("PowrProf.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern bool SetSuspendState(bool hiberate, bool forceCritical, bool disableWakeEvent);
+
         SettingsModel settingsM = new SettingsModel();
 
         private LOHM.Computer _computer;
@@ -43,12 +48,47 @@ namespace HeatChecker
 
         public Form1()
         {
+            CheckIfAlreadyRunning();
             InitializeComponent();
             InitializeChart();
             InitializeTimer();
             InitializeHardwareMonitor();
             InitializeCustomProgressBar();
             InitializeSystemTray();
+        }
+
+        private bool CheckIfAlreadyRunning()
+        {
+            int indexer = 0;
+            var processes = Process.GetProcessesByName("HeatChecker");
+
+            if (processes.Length > 1)
+            {
+                var promp = MessageBox.Show("An instance of this application already running.\n\n" +
+                    "Do you want to kill other process and start a new one?", "Already running", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+                
+                if (promp == DialogResult.Yes)
+                {
+                    this.WindowState = FormWindowState.Normal;
+                    this.BringToFront();
+                    this.Activate();
+                    this.Focus();
+
+                    foreach (var process in processes)
+                    {
+                        if(indexer != processes.Length - 1)// means if it's the last turn (so we won't kill the main app's process)
+                            process.Kill();
+                        indexer++;
+                    }
+                }
+
+                else foreach (var process in processes)
+                    {
+                        process.Kill(); // kill all processes. including this one.
+                    }
+
+            }
+            return false;
         }
 
         private void InitializeSystemTray()
@@ -99,10 +139,13 @@ namespace HeatChecker
 
         protected override void OnResize(EventArgs e)
         {
-            base.OnResize(e);
-            if (this.WindowState == FormWindowState.Minimized)
+            if (settingsM.MinimizeToSystemtray)
             {
-                this.Hide();
+                base.OnResize(e);
+                if (this.WindowState == FormWindowState.Minimized)
+                {
+                    this.Hide();
+                }
             }
         }
 
@@ -110,6 +153,7 @@ namespace HeatChecker
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            LoadSettings();
             PlaySfx(SfxVine);
         }
 
@@ -146,7 +190,6 @@ namespace HeatChecker
 
             chart1.Series["CpuTemp"].ChartType = SeriesChartType.Line;
             chart1.Series["CpuLoad"].ChartType = SeriesChartType.Spline;
-            chart1.Series["FanSpeed"].ChartType = SeriesChartType.Spline;
 
             chart1.ChartAreas[0].AxisX.Title = "Time";
             chart1.ChartAreas[0].AxisY.Title = "Value";
@@ -161,26 +204,13 @@ namespace HeatChecker
             };
             _timer.Tick += Timer_Tick;
             _timer.Start();
+
+            batteryCheckTimer.Interval = settingsM.BatteryCheckInterval >= 0 ? 1000 : settingsM.UpdateInterval;
+
         }
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if(settingsM.WarmWhen != StngChrageStatus.Disabled)
-            {
-                PowerStatus pwr = System.Windows.Forms.SystemInformation.PowerStatus;
-
-                bool isCharging = pwr.PowerLineStatus == PowerLineStatus.Online ? true : false;
-
-                var chargeStatus = pwr.BatteryChargeStatus;
-
-                string chrgl = chargeStatus.ToString().ToLower();
-
-                if (!isCharging || (chrgl.Contains("low") && !isCharging))
-                {
-                    HandleLowBattery();
-                }
-            }
-
             float cpuTempUI = 0;
             foreach (var hardwareItem in _computer.Hardware)
             {
@@ -247,28 +277,44 @@ namespace HeatChecker
             }
         }
 
-        private void HandleLowBattery()
-        {
-            if(settingsM.PlaySounds)
-                lowBatterySound.PlaySync();
+        private readonly object soundLock = new(); // Ensures thread safety for sound playback.
 
-            AnimateLabel(lblBatteryStatus);
+        private bool IsSoundPlaying()
+        {
+            lock (soundLock)
+            {
+                if (isPlayingBatterySound) return true;
+                isPlayingBatterySound = true;
+                return false;
+            }
         }
 
-        async Task AnimateLabel(Label label)
+        private void SetSoundPlaying(bool state)
         {
-            label.BackColor = Color.Red;
-            label.ForeColor = Color.WhiteSmoke;
-            Task.Delay(1000).Wait();
-            label.BackColor = Color.WhiteSmoke;
-            label.ForeColor = Color.Red;
-            Task.Delay(1000).Wait();
-            label.BackColor = Color.Red;
-            label.ForeColor = Color.WhiteSmoke;
-            Task.Delay(1000).Wait();
-            label.BackColor = Color.WhiteSmoke;
-            label.ForeColor = Color.Red;
-            Task.Delay(1000).Wait();
+            lock (soundLock)
+            {
+                isPlayingBatterySound = state;
+            }
+        }
+
+        private async Task AnimateLabelAsync(Label label)
+        {
+            Color originalBackColor = label.BackColor;
+            Color originalForeColor = label.ForeColor;
+
+            for (int i = 0; i < 4; i++) // Blink 4 times
+            {
+                label.BackColor = Color.Red;
+                label.ForeColor = Color.White;
+                await Task.Delay(1000); // Wait asynchronously
+
+                label.BackColor = originalBackColor;
+                label.ForeColor = Color.Red;
+                await Task.Delay(1000); // Wait asynchronously
+            }
+
+            label.BackColor = originalBackColor; // Restore original colors
+            label.ForeColor = originalForeColor;
         }
 
         private void ScrollChartLeft(string seriesName)
@@ -331,6 +377,10 @@ namespace HeatChecker
         private void ApplySettings()
         {
             _timer.Interval = settingsM.UpdateInterval * 500 + 1;
+            batteryCheckTimer.Interval = settingsM.BatteryCheckInterval * 500 + 1;
+
+            if (settingsM.WarmWhen == StngChrageStatus.Disabled) lblBatteryStatus.ForeColor = Color.BlueViolet; else lblBatteryStatus.Enabled = false;
+            if (settingsM.MinimizeToSystemtray) InitializeSystemTray();
         }
 
         private void StopSounds()
@@ -391,6 +441,121 @@ namespace HeatChecker
             settings.ShowDialog();
             settingsM = settings.ReturnedSettings;
             ApplySettings();
+            SaveSettings();
+        }
+
+        private void LoadSettings()
+        {
+            settingsM = DataManager.ReadSettings(Application.StartupPath + @"\data\meta.data", true);
+            ApplySettings();
+        }
+
+        private void SaveSettings()
+        {
+            DataManager.WriteSettings(Application.StartupPath + @"\data\meta.data", settingsM, true);
+        }
+
+        private void batteryCheckTimer_Tick(object sender, EventArgs e)
+        {
+            if (settingsM.WarmWhen != StngChrageStatus.Disabled)
+            {
+                PowerStatus pwr = System.Windows.Forms.SystemInformation.PowerStatus;
+
+                bool isCharging = pwr.PowerLineStatus == PowerLineStatus.Online ? true : false;
+
+                var chargeStatus = pwr.BatteryChargeStatus;
+
+                string chrgl = chargeStatus.ToString().ToLower();
+
+                if (!isCharging || (chrgl.Contains("low") && !isCharging))
+                {
+                    if (settingsM.SleepWhnChrgLow) { SleepPc(); return; }
+                    lblBatteryStatus.Text = "Not Charging";
+                    HandleLowBattery();
+                }
+
+                lblBatteryStatus.Text = "Charging";
+            }
+        }
+        private void SleepPc()
+        {
+            SetSuspendState(false, true, true);
+        }
+
+        private async void HandleLowBattery()
+        {
+            if (settingsM.PlaySounds && !IsSoundPlaying())
+            {
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        lowBatterySound.PlaySync(); // Play the sound.
+                    }
+                    catch (Exception ex)
+                    {
+                        // Handle or log the exception.
+                        Console.WriteLine($"Error playing low battery sound: {ex.Message}");
+                    }
+                    finally
+                    {
+                        SetSoundPlaying(false); // Reset the flag.
+                    }
+                });
+            }
+
+            await AnimateLabelAsync(lblBatteryStatus);
+        }
+
+        #region ToolStrip items
+        private void secToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void updateNowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Timer_Tick(this, e);
+            batteryCheckTimer_Tick(this, e);
+        }
+
+        private void alwaysOnTopToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.TopMost = !this.TopMost;
+        }
+
+        private void restartToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Restart();
+            Environment.Exit(0);
+        }
+
+
+        #endregion
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Settings settings = new Settings(settingsM); // the form!
+            settings.ShowDialog();
+            settingsM = settings.ReturnedSettings;
+            ApplySettings();
+            SaveSettings();
+        }
+
+        private void showOnTaskbarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.ShowInTaskbar = !this.ShowInTaskbar;
+        }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+                this.WindowState = FormWindowState.Minimized;
+
+            // prevent child controls from handling this event as well
+            e.SuppressKeyPress = true;
+
+            return;
         }
     }
 }
